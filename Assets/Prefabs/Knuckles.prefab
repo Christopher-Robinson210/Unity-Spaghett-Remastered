@@ -98,11 +98,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 0}
   audioClip: {fileID: 8300000, guid: 5da8aee78bd89014f92c1c9b2068b0e1, type: 3}
-  clicksToKill: 8
+  clicksToKill: 6
   speed: 0.25
   damage: 5
   attackDelay: 2
   target: {fileID: 0}
+  isCollide: 0
   isAlive: 1
 --- !u!61 &-68166965219069095
 BoxCollider2D:

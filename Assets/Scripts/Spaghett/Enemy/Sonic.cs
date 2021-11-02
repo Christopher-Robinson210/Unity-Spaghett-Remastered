@@ -64,9 +64,23 @@ namespace Spaghett
                 }
                 else
                 {
+                    SonicFlip();
                     audioSource.PlayOneShot(noMoveClip);
                 }
             }
+        }
+
+        void SonicFlip()
+        {
+            StartCoroutine(DelayFlip());
+        }
+
+        IEnumerator DelayFlip()
+        {
+            SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer.flipX = true;
+            yield return new WaitForSeconds(0.25f);
+            spriteRenderer.flipX = false;
         }
     }
 }

@@ -9,9 +9,21 @@ namespace Spaghett
         public AudioClip moveClip;
         public AudioClip noMoveClip;
         private bool doJump;
+        private bool spin = false;
+        private float spinRate = 1250f;
+        private float z = 0;
+
         private void Start()
         {
             doJump = DoJump();
+        }
+
+        private void Update()
+        {
+            if (spin == true)
+            {
+                Spin();
+            }
         }
         public override void Move()
         {
@@ -24,7 +36,7 @@ namespace Spaghett
 
         public bool DoJump()
         {
-            return (Random.Range(0, 2) == 0);
+            return (Mathf.Floor(Random.Range(0, 2)) == 0);
         }
 
         public override void Hit()
@@ -35,6 +47,7 @@ namespace Spaghett
             {
                 if (doJump)
                 {
+                    spin = true;
                     StartCoroutine(DelayTP());
                     // decide how to teleport
                     //DoTeleport();
@@ -50,6 +63,22 @@ namespace Spaghett
         void SonicFlip()
         {
             StartCoroutine(DelayFlip());
+        }
+
+        void Spin()
+        {
+
+            if (z < 360)
+            {
+                z = z + ((spinRate + (spinRate/4)) * Time.deltaTime);
+                transform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, z);
+            }
+            else
+            {
+                spin = false;
+            }
+                
+                
         }
 
         void DoTeleport()
@@ -97,16 +126,15 @@ namespace Spaghett
         {
             SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.flipX = true;
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.15f);
             spriteRenderer.flipX = false;
         }
 
         IEnumerator DelayTP()
         {
-            Vector3 temp = transform.localScale;
-            transform.localScale = new Vector3(transform.localScale.x + .03f, transform.localScale.y + .03f, 0f);
-            yield return new WaitForSecondsRealtime(0.35f);
-            transform.localScale = temp;
+            //Vector3 temp = transform.localScale;
+            //spin = true;
+            yield return new WaitForSeconds(0.15f);
             DoTeleport();
         }
     }

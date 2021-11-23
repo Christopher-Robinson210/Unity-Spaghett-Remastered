@@ -47,3 +47,6 @@ TagManager:
   - name: GameObjects
     uniqueID: 802342367
     locked: 0
+  - name: Particles
+    uniqueID: 567778427
+    locked: 0

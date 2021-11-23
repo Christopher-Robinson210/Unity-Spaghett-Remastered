@@ -7,8 +7,10 @@ namespace Spaghett
 
     public class Enemy : MonoBehaviour
     {
+        private ParticleSystem ps;
         [HideInInspector]public AudioSource audioSource;
         public AudioClip audioClip;
+        public AudioClip hitClip;
         public int clicksToKill;
         public float speed = 1f;
         public int damage = 5;
@@ -17,9 +19,13 @@ namespace Spaghett
         [HideInInspector]public bool isCollide;
         [HideInInspector]public bool isAlive = true;
         private bool canDamage;
+        private bool shake = false;
+        private bool isBoom = false;
+        private float y = 0f;
 
         private void Awake()
         {
+            ps = GetComponent<ParticleSystem>();
             audioSource = transform.parent.GetComponent<AudioSource>();
             target = GameObject.Find("Spaghett");
             //print($"Name: {gameObject.name} Created!\nHealth: {health}");
@@ -32,10 +38,8 @@ namespace Spaghett
         {
             Move();
             IsAlive();
-            if (name.Equals("Troll"))
-            {
-                print($"{name}: {transform.position}");
-            }
+            Shake();
+            Death();
  
         }
 
@@ -96,7 +100,13 @@ namespace Spaghett
         {
             clicksToKill--;
             print($"HIT {gameObject.name}! \nHealth: {clicksToKill}");
+            shake = true;
             IsAlive();
+            if (isAlive)
+            {
+                audioSource.PlayOneShot(hitClip);
+            }
+
         }
 
 
@@ -111,11 +121,50 @@ namespace Spaghett
             else
             {
                 isAlive = false;
-                Spaghett.GameManager.killCount++;
-                audioSource.PlayOneShot(audioClip);
-                Destroy(gameObject);
+                
+                //Destroy(gameObject);
                 return false;
             }
+        }
+
+        public void Shake()
+        {
+            if (shake)
+            {
+                StartCoroutine(DoShake());
+            }
+        }
+
+        public void Death()
+        {
+            if (!isAlive && !isBoom)
+            {
+                StartCoroutine(Boom());
+            }
+        }
+
+        IEnumerator Boom()
+        {
+            isBoom = true;
+            ps.Play(true);
+            GetComponent<SpriteRenderer>().forceRenderingOff = true;
+            audioSource.PlayOneShot(audioClip);
+            yield return new WaitForSeconds(.25f);
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            Destroy(gameObject);
+            Spaghett.GameManager.killCount++;
+
+        }
+
+        IEnumerator DoShake()
+        {
+            y = transform.localPosition.y;
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - .01f, 0);
+            //ps.Play();
+            yield return new WaitForSeconds(.05f);
+            transform.localPosition = new Vector3(transform.localPosition.x, y + .01f, 0);
+            //ps.Stop(true,ParticleSystemStopBehavior.StopEmitting);
+            shake = false;
         }
     }
 }
